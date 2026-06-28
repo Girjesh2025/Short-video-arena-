@@ -151,7 +151,7 @@ locales = utils.load_locales(i18n_dir)
 title_col, lang_col = st.columns([3, 1])
 
 with title_col:
-    st.title(f"MoneyPrinterTurbo v{config.project_version}")
+    st.markdown(f'<h1 class="gradient-text" style="font-size: 2.2rem; margin: 0; padding: 0; line-height: 1.2;">MoneyPrinterTurbo <span style="font-size: 13px; font-weight: 500; color: #94A3B8; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 3px 10px; border-radius: 20px; vertical-align: middle; margin-left: 8px; display: inline-block;">v{config.project_version}</span></h1>', unsafe_allow_html=True)
 
 with lang_col:
     display_languages = []
@@ -334,39 +334,132 @@ selected_menu = st.sidebar.radio("", menu_options, index=0)
 
 # Custom SaaS styling
 st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* Global Font & Background overrides */
+html, body, [data-testid="stAppViewContainer"], .main {
+    font-family: 'Outfit', sans-serif !important;
+    background-color: #090D16 !important;
+}
+
+/* Header typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700 !important;
+}
+
+/* Gradient Title */
+.gradient-text {
+    background: linear-gradient(135deg, #FF2E93 0%, #FF8E53 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-weight: 800 !important;
+}
+
 /* Sidebar styling */
 [data-testid="stSidebar"] {
-    background-color: #0F172A;
+    background: linear-gradient(180deg, #060913 0%, #0F1322 100%) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
 }
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-    color: #F8FAFC;
-    font-size: 16px;
-    font-weight: 500;
+    font-family: 'Outfit', sans-serif !important;
+    color: #F1F5F9 !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
 }
-/* Main panel cards */
-.stCard {
-    background-color: #1E293B;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid #334155;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+
+/* Sidebar navigation active state divider styling */
+[data-testid="stSidebar"] hr {
+    margin: 15px 0 !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
 }
-/* Primary button styling */
+
+/* Custom premium card containers */
+div[data-testid="stVerticalBlock"] > div[style*="border"] {
+    background: linear-gradient(145deg, rgba(20, 26, 45, 0.7) 0%, rgba(11, 15, 28, 0.75) 100%) !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.25) !important;
+    padding: 24px !important;
+    margin-bottom: 24px !important;
+    transition: all 0.3s ease-in-out !important;
+}
+div[data-testid="stVerticalBlock"] > div[style*="border"]:hover {
+    border-color: rgba(255, 46, 147, 0.25) !important;
+    box-shadow: 0 10px 35px 0 rgba(255, 46, 147, 0.06) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Inputs, textareas and selectbox customization */
+div[data-baseweb="select"] > div,
+div[data-baseweb="input"] > div,
+textarea,
+input {
+    background-color: #131A2A !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 10px !important;
+    color: #F8FAFC !important;
+    transition: all 0.2s ease-in-out !important;
+}
+div[data-baseweb="select"] > div:hover,
+div[data-baseweb="input"] > div:hover,
+textarea:hover,
+input:hover {
+    border-color: rgba(255, 142, 83, 0.4) !important;
+}
+
+/* Tab button customization */
+button[data-baseweb="tab"] {
+    font-family: 'Outfit', sans-serif !important;
+    color: #64748B !important;
+    font-weight: 600 !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    transition: all 0.2s ease !important;
+}
+button[data-baseweb="tab"]:hover {
+    color: #F1F5F9 !important;
+}
+button[data-baseweb="tab"][aria-selected="true"] {
+    color: #FF8E53 !important;
+    border-bottom: 2px solid #FF8E53 !important;
+}
+
+/* Main action button (Primary) */
 div.stButton > button:first-child {
-    background: linear-gradient(90deg, #FF3366 0%, #FF9933 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 24px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    width: 100%;
+    background: linear-gradient(135deg, #FF2E93 0%, #FF8E53 100%) !important;
+    color: #FFFFFF !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 30px !important;
+    box-shadow: 0 4px 20px rgba(255, 46, 147, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    width: 100% !important;
 }
 div.stButton > button:first-child:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 51, 102, 0.4);
+    transform: translateY(-3px) scale(1.005) !important;
+    box-shadow: 0 8px 30px rgba(255, 46, 147, 0.4) !important;
+    color: #FFFFFF !important;
+}
+div.stButton > button:first-child:active {
+    transform: translateY(-1px) !important;
+}
+
+/* Secondary Button (e.g. Delete, Play, Download) */
+button[key^="del_"], button[key^="dl_"], button[key^="play_"] {
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Success and Alert box roundings */
+div[data-testid="stNotification"] {
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 </style>
 """, unsafe_allow_html=True)
