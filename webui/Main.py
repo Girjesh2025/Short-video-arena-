@@ -1993,12 +1993,25 @@ elif selected_menu in [
         progress_bar = st.progress(0)
         status_msg = st.info("Initializing task...")
 
+        start_time = time.time()
         last_progress = 0
         while task_thread.is_alive():
             task = state_module.state.get_task(task_id)
             if task:
                 progress = task.get("progress", last_progress)
                 state_code = task.get("state", 4)
+                
+                # Estimate remaining time
+                elapsed = time.time() - start_time
+                if progress >= 5:
+                    eta_seconds = int(elapsed * (100 - progress) / progress)
+                    if eta_seconds > 60:
+                        eta_str = f"{eta_seconds // 60}m {eta_seconds % 60}s"
+                    else:
+                        eta_str = f"{eta_seconds}s"
+                    eta_display = f" | ⏳ **Remaining:** {eta_str}"
+                else:
+                    eta_display = " | ⏳ **Remaining:** Calculating..."
                 
                 if progress <= 5:
                     desc = "Initializing task parameters..."
@@ -2019,7 +2032,7 @@ elif selected_menu in [
                     
                 last_progress = progress
                 progress_bar.progress(progress / 100.0)
-                status_msg.info(f"**Step Progress: {progress}%** — {desc}")
+                status_msg.info(f"**Step Progress: {progress}%** — {desc}{eta_display}")
                 
             time.sleep(1)
 
