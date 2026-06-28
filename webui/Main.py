@@ -333,7 +333,7 @@ menu_options = [
 selected_menu = st.sidebar.radio("", menu_options, index=0)
 
 # Custom SaaS styling
-st.markdown("""
+st.html("""
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* Global Font & Background overrides */
@@ -462,7 +462,7 @@ div[data-testid="stNotification"] {
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 </style>
-""", unsafe_allow_html=True)
+""")
 
 if selected_menu == "⚙️ " + tr("System Settings"):
     st.title("⚙️ " + tr("System Settings"))
