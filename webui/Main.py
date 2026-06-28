@@ -910,10 +910,10 @@ if selected_menu == "⚙️ " + tr("System Settings"):
 
 elif selected_menu == "🎬 " + tr("Video Generator"):
     llm_provider = config.app.get("llm_provider", "").lower()
-    panel = st.columns(3)
+    panel = st.columns([1.5, 1.0])
     left_panel = panel[0]
     middle_panel = panel[1]
-    right_panel = panel[2]
+    right_panel = panel[1]
 
     params = VideoParams(video_subject="")
     params.match_materials_to_script = bool(
