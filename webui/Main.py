@@ -326,7 +326,11 @@ st.sidebar.markdown("""
 """, unsafe_allow_html=True)
 
 menu_options = [
-    "🎬 " + tr("Video Generator"),
+    "✍️ " + tr("Script & Topic"),
+    "🎞️ " + tr("Video Settings"),
+    "🔊 " + tr("Audio Settings"),
+    "🎨 " + tr("Subtitle Settings"),
+    "🎬 " + tr("Video Compiler"),
     "📁 " + tr("Saved Videos"),
     "⚙️ " + tr("System Settings")
 ]
@@ -908,14 +912,34 @@ if selected_menu == "⚙️ " + tr("System Settings"):
 
 
 
-elif selected_menu == "🎬 " + tr("Video Generator"):
-    llm_provider = config.app.get("llm_provider", "").lower()
-    panel = st.columns([1.5, 1.0])
-    left_panel = panel[0]
-    middle_panel = panel[1]
-    right_panel = panel[1]
+elif selected_menu in [
+    "✍️ " + tr("Script & Topic"),
+    "🎞️ " + tr("Video Settings"),
+    "🔊 " + tr("Audio Settings"),
+    "🎨 " + tr("Subtitle Settings"),
+    "🎬 " + tr("Video Compiler")
+]:
+    render_script = (selected_menu == "✍️ " + tr("Script & Topic"))
+    render_video = (selected_menu == "🎞️ " + tr("Video Settings"))
+    render_audio = (selected_menu == "🔊 " + tr("Audio Settings"))
+    render_subtitles = (selected_menu == "🎨 " + tr("Subtitle Settings"))
+    render_compiler = (selected_menu == "🎬 " + tr("Video Compiler"))
 
-    params = VideoParams(video_subject="")
+    # Initial parameter settings persistence
+    if "params" not in st.session_state:
+        from app.models.schema import VideoParams
+        st.session_state["params"] = VideoParams(video_subject="")
+    params = st.session_state["params"]
+
+    if "video_subject" in st.session_state and st.session_state["video_subject"] and not params.video_subject:
+        params.video_subject = st.session_state["video_subject"]
+
+    llm_provider = config.app.get("llm_provider", "").lower()
+    
+    # Use full screen containers instead of columns
+    left_panel = st.container()
+    middle_panel = st.container()
+    right_panel = st.container()
     params.match_materials_to_script = bool(
         st.session_state.get("match_materials_to_script", False)
     )
@@ -923,10 +947,12 @@ elif selected_menu == "🎬 " + tr("Video Generator"):
     uploaded_audio_file = None
 
     with left_panel:
+      if render_script:
         with st.container(border=True):
             st.write(tr("Video Script Settings"))
             params.video_subject = st.text_input(
                 tr("Video Subject"),
+                value=params.video_subject,
                 key="video_subject",
             ).strip()
 
@@ -958,6 +984,7 @@ elif selected_menu == "🎬 " + tr("Video Generator"):
                 )
                 params.video_script_prompt = st.text_area(
                     tr("Custom Script Requirements"),
+                    value=params.video_script_prompt,
                     height=100,
                     max_chars=llm.MAX_SCRIPT_PROMPT_LENGTH,
                     placeholder=tr("Custom Script Requirements Placeholder"),
@@ -973,6 +1000,7 @@ elif selected_menu == "🎬 " + tr("Video Generator"):
                 if use_custom_system_prompt:
                     custom_system_prompt = st.text_area(
                         tr("Custom System Prompt"),
+                        value=params.custom_system_prompt,
                         height=240,
                         max_chars=llm.MAX_SCRIPT_SYSTEM_PROMPT_LENGTH,
                         key="custom_system_prompt",
@@ -1030,6 +1058,7 @@ elif selected_menu == "🎬 " + tr("Video Generator"):
             )
 
     with middle_panel:
+      if render_video:
         with st.container(border=True):
             st.write(tr("Video Settings"))
             video_concat_modes = [
@@ -1166,6 +1195,7 @@ elif selected_menu == "🎬 " + tr("Video Generator"):
                     help=tr("Video Encoder Help"),
                 )
                 config.app["video_codec"] = video_codec_options[selected_codec_index][1]
+      if render_audio:
         with st.container(border=True):
             st.write(tr("Audio Settings"))
 
@@ -1622,6 +1652,7 @@ elif selected_menu == "🎬 " + tr("Video Generator"):
             )
 
     with right_panel:
+      if render_subtitles:
         with st.container(border=True):
             st.write(tr("Subtitle Settings"))
             params.subtitle_enabled = st.checkbox(tr("Enable Subtitles"), value=True)
@@ -1842,7 +1873,17 @@ elif selected_menu == "🎬 " + tr("Video Generator"):
                         config.save_config()
                         st.success(tr("Coverr API Key deleted successfully"))
 
-    start_button = st.button(tr("Generate Video"), use_container_width=True, type="primary")
+    if render_compiler:
+        # Quick config summary card
+        with st.container(border=True):
+            st.subheader("📋 Video Compilation Summary")
+            st.write(f"**Subject:** {params.video_subject if params.video_subject else 'No subject entered'}")
+            st.write(f"**Aspect Ratio:** {params.video_aspect}")
+            st.write(f"**Voice Engine:** {params.voice_name}")
+            script_len = len(params.video_script) if params.video_script else 0
+            st.write(f"**Script Length:** {script_len} characters")
+        st.write("")
+    start_button = st.button(tr("Generate Video"), use_container_width=True, type="primary") if render_compiler else False
     if start_button:
         config.save_config()
         task_id = str(uuid4())
