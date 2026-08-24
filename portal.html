@@ -3263,8 +3263,20 @@ function onNewTopicAdded(topic) {
 <script src="/reports/marked.min.js"></script>
 <script>
   const $ = id => document.getElementById(id);
+  const VALID_VIEWS = ['dashboard', 'team', 'generator', 'automation', 'scripts', 'audio', 'videos', 'thumbnails', 'reports', 'youtube', 'competitors', 'reels'];
+
+  function getInitialView() {
+    const hash = (location.hash || '').replace('#', '').trim().toLowerCase();
+    if (hash && VALID_VIEWS.includes(hash)) return hash;
+    try {
+      const saved = (localStorage.getItem('hermes_active_view') || '').trim().toLowerCase();
+      if (saved && VALID_VIEWS.includes(saved)) return saved;
+    } catch(e) {}
+    return 'dashboard';
+  }
+
   let data = null;
-  let view = 'dashboard';
+  let view = getInitialView();
   let activeScriptText = '';
   let scriptFontSize = 16;
 
@@ -3563,7 +3575,15 @@ function onNewTopicAdded(topic) {
   });
 
   function switchView(v) {
+    if (!VALID_VIEWS.includes(v)) v = 'dashboard';
     view = v;
+    try {
+      localStorage.setItem('hermes_active_view', v);
+      if (location.hash !== '#' + v) {
+        history.replaceState(null, '', '#' + v);
+      }
+    } catch(e) {}
+
     document.querySelectorAll('.nav-item[data-view]').forEach(i => i.classList.toggle('active', i.dataset.view === v));
     document.querySelectorAll('.view').forEach(s => s.classList.remove('show'));
     const target = $('view-' + v);
@@ -3593,6 +3613,13 @@ function onNewTopicAdded(topic) {
     }
     renderView();
   }
+
+  window.addEventListener('hashchange', () => {
+    const h = (location.hash || '').replace('#', '').trim().toLowerCase();
+    if (h && VALID_VIEWS.includes(h) && h !== view) {
+      switchView(h);
+    }
+  });
 
   async function load() {
     try {
@@ -7488,6 +7515,7 @@ function onNewTopicAdded(topic) {
   if ($('logoutBtn')) $('logoutBtn').addEventListener('click', () => { location.href = '/'; });
 
   startQuotaCountdown();
+  switchView(view);
   load();
   loadCompetitors();
   setInterval(load, 8000);
