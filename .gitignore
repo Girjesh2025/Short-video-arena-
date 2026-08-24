@@ -1,0 +1,10 @@
+.DS_Store
+*.tar.xz
+*.tar.gz
+*.zip
+__pycache__/
+*.pyc
+.remote-edit/
+00:00*
+node_modules/
+.next/
